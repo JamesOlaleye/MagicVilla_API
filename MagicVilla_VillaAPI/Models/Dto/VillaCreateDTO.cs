@@ -2,9 +2,8 @@
 
 namespace MagicVilla_VillaAPI.Models.Dto
 {
-    public class VillaDTO
-    {
-        public int Id { get; set; }
+    public class VillaCreateDTO
+    {      
         [Required]
         [MaxLength(30)]
         public string Name { get; set; } 
