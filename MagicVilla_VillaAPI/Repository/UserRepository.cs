@@ -6,7 +6,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-
 namespace MagicVilla_VillaAPI.Repository
 {
     public class UserRepository : IUserRepository
@@ -32,8 +31,8 @@ namespace MagicVilla_VillaAPI.Repository
 
         public async  Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO)
         {
-            var user = _db.LocalUsers.FirstOrDefault(u=>u.UserName.ToLower()==loginRequestDTO.UserName.ToLower() && 
-            u.Password==loginRequestDTO.Password);
+            var user = _db.LocalUsers.FirstOrDefault(u => u.UserName.ToLower() == loginRequestDTO.UserName.ToLower() && 
+            u.Password == loginRequestDTO.Password);
 
             if (user == null) 
             {
