@@ -2,6 +2,7 @@
 using MagicVilla_Web.Models;
 using MagicVilla_Web.Services.IServices;
 using Newtonsoft.Json;
+using System.Net.Http.Headers;
 using System.Text;
 
 namespace MagicVilla_Web.Services
@@ -25,7 +26,8 @@ namespace MagicVilla_Web.Services
                 message.RequestUri = new Uri(apiRequest.Url);
                 if (apiRequest.Data != null)
                 {
-                    message.Content = new StringContent(JsonConvert.SerializeObject(apiRequest.Data), Encoding.UTF8, "application/json");
+                    message.Content = new StringContent(JsonConvert.SerializeObject(apiRequest.Data), 
+                        Encoding.UTF8, "application/json");
                 }
                 switch (apiRequest.ApiType)
                 {
@@ -44,6 +46,11 @@ namespace MagicVilla_Web.Services
                 }
 
                 HttpResponseMessage apiResponse = null;
+
+                if(!string.IsNullOrEmpty(apiRequest.Token))
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiRequest.Token);
+                }
 
                 apiResponse = await client.SendAsync(message);
 
