@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Asp.Versioning;
+using AutoMapper;
 using MagicVilla_VillaAPI.Data;
 using MagicVilla_VillaAPI.Models;
 using MagicVilla_VillaAPI.Models.Dto;
@@ -8,12 +9,15 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections;
 using System.Net;
 
 namespace MagicVilla_VillaAPI.Controllers
 {
-    [Route("api/villaNumberAPI")]
+    [Route("api/v{version:apiVersion}/villaNumberAPI")]
     [ApiController]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     public class VillaNumberAPIController: ControllerBase
     {
         protected APIResponse _response = new();
@@ -30,6 +34,7 @@ namespace MagicVilla_VillaAPI.Controllers
         }
 
         [HttpGet]
+        [MapToApiVersion("1.0")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<APIResponse>> GetVillaNumbers() 
         {
@@ -46,7 +51,14 @@ namespace MagicVilla_VillaAPI.Controllers
                 _response.ErrorMessages = new List<string>() { ex.ToString() };
             }
             return _response;
-        }   
+        }
+
+        [MapToApiVersion("2.0")]
+        [HttpGet]
+        public IEnumerable<string> Get()
+        {
+            return new string[] { "value1", "value2" };
+        }
 
         [HttpGet("{id:int}", Name="GetVillaNumber")]
         [ProducesResponseType(StatusCodes.Status200OK)]

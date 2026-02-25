@@ -1,17 +1,21 @@
-
+﻿
 using MagicVilla_VillaAPI;
 using MagicVilla_VillaAPI.Data;
 using MagicVilla_VillaAPI.Repository;
 using MagicVilla_VillaAPI.Repository.IRepository;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
+using Asp.Versioning;
+//using Asp.Versioning.ApiExplorer;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+// ===== Database & Repositories =====
 builder.Services.AddDbContext<ApplicationDbContext>(option => {
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultSQLConnection"));
     });
@@ -20,6 +24,24 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IVillaNumberRepository, VillaNumberRepository>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+//builder.Services.AddControllers();
+
+// ===== API Versioning =====
+builder.Services
+    .AddApiVersioning(options =>
+    {
+        options.AssumeDefaultVersionWhenUnspecified = false; // ❌ force version required
+        options.DefaultApiVersion = new ApiVersion(1, 0);
+        //options.ReportApiVersions = true;
+        //options.ApiVersionReader = new UrlSegmentApiVersionReader();
+    })
+    .AddApiExplorer(options =>
+    {
+        options.GroupNameFormat = "'v'VVV"; // v1, v1.0, v2
+        //options.SubstituteApiVersionInUrl = true; // required for Swagger
+    });
+
+// ===== Authentication =====
 var key = builder.Configuration.GetValue<string>("ApiSettings:Secret");
 
 builder.Services.AddAuthentication(x =>
@@ -39,10 +61,13 @@ builder.Services.AddAuthentication(x =>
         };
 });
 
+// ===== Controllers =====
 builder.Services.AddControllers(option=>
 {
     //option.ReturnHttpNotAcceptable = true;
 }).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
+
+// ===== Swagger =====
 builder.Services.AddEndpointsApiExplorer(); 
 builder.Services.AddSwaggerGen(options => {
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -73,9 +98,11 @@ builder.Services.AddSwaggerGen(options => {
         }
     });
 });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+// ===== Middleware =====
 if (app.Environment.IsDevelopment())
 { 
     app.UseSwagger(); 
