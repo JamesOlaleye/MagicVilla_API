@@ -1,10 +1,13 @@
 ﻿using MagicVilla_VillaAPI.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace MagicVilla_VillaAPI.Data
 {
-    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
     {
+
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<LocalUser> LocalUsers { get; set; }
         public DbSet<Villa> Villas { get; set; }
         public DbSet<VillaNumber> VillaNumbers { get; set; }
@@ -15,7 +18,8 @@ namespace MagicVilla_VillaAPI.Data
             //modelBuilder.Entity<Villa>()
             //   .Property(v => v.CreatedDate)
             //   .HasDefaultValueSql("GETUTCDATE()");
-                
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Villa>().HasData(
                 new Villa()
                 {
